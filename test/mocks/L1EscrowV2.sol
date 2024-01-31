@@ -1,23 +1,33 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.23;
 
-import {L1Escrow} from "@src/L1Escrow.sol";
+import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import {AccessControlDefaultAdminRulesUpgradeable} from "@openzeppelin/contracts-upgradeable/access/extensions/AccessControlDefaultAdminRulesUpgradeable.sol"; // forgefmt: disable-line
 
 /**
  * @title L1EscrowV2
  * @author sepyke.eth
- * @notice A mock contract to play around with and test how the L1Escrow can be upgraded
  */
-contract L1EscrowV2 is L1Escrow {
-    uint256 public some;
+contract L1EscrowV2 is AccessControlDefaultAdminRulesUpgradeable, UUPSUpgradeable {
+    /// @notice Escrow manager role identifier
+    bytes32 public constant ESCROW_MANAGER = keccak256("ESCROW_MANAGER");
 
-    /// @dev Add new function for testing purpose
-    function setValue(uint256 _some) public {
-        some = _some;
+    /// @notice Disable initializer on deploy
+    constructor() {
+        _disableInitializers();
     }
 
-    /// @dev Add new function for testing purpose
-    function getValue() public view returns (uint256 b) {
-        b = some;
+    function initialize(address _admin, address _manager) public virtual initializer {
+        // Inits
+        __AccessControlDefaultAdminRules_init(3 days, _admin);
+        __UUPSUpgradeable_init();
+
+        _grantRole(ESCROW_MANAGER, _manager);
     }
+
+    /**
+     * @dev Only the owner can upgrade the L1Escrow
+     * @param _newVersion The contract address of a new version
+     */
+    function _authorizeUpgrade(address _newVersion) internal override onlyRole(DEFAULT_ADMIN_ROLE) {}
 }

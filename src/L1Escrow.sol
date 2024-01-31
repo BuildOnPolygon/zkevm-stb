@@ -18,7 +18,7 @@ contract L1Escrow is AccessControlDefaultAdminRulesUpgradeable, UUPSUpgradeable 
         _disableInitializers();
     }
 
-    function initialize(address _admin, address _manager) public initializer {
+    function initialize(address _admin, address _manager) public virtual initializer {
         // Inits
         __AccessControlDefaultAdminRules_init(3 days, _admin);
         __UUPSUpgradeable_init();

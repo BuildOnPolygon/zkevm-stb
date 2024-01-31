@@ -8,6 +8,7 @@ import {L1Escrow} from "@src/L1Escrow.sol";
 import {Proxy} from "@src/Proxy.sol";
 
 import {ICREATE3Factory} from "./interfaces/ICREATE3Factory.sol";
+import {L1EscrowV2} from "./mocks/L1EscrowV2.sol";
 
 /**
  * @title L1EscrowTest
@@ -52,9 +53,25 @@ contract L1EscrowTest is Test {
     //****************************//
     //          Upgrade           //
     //****************************//
+
+    /// @dev It should hit a snag and revert if someone who's not an admin tries to upgrade the L1Escrow
     function testUpgradeAsNonAdmin() public {
         vm.startPrank(alice);
         vm.expectRevert(abi.encodeWithSelector(IAccessControl.AccessControlUnauthorizedAccount.selector, alice, 0x00));
         escrow.upgradeToAndCall(vm.addr(2), "");
+    }
+
+    /// @dev It's all good if an admin is the one upgrading the L1Escrow
+    function testUpgradeAsAdmin() public {
+        // Step 1: Deploy implementation contract
+        L1EscrowV2 v2 = new L1EscrowV2();
+
+        // Step 2: Prepare the initializer call data
+        bytes memory data = abi.encodeWithSelector(L1EscrowV2.initialize.selector, admin, manager);
+
+        // Step 3: Admin execute upgrade
+        vm.startPrank(admin);
+        escrow.upgradeToAndCall(address(v2), data);
+        vm.stopPrank();
     }
 }
