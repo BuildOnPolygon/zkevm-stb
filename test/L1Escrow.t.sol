@@ -4,6 +4,9 @@ pragma solidity 0.8.23;
 import {Test} from "forge-std/Test.sol";
 
 import {IAccessControl} from "@openzeppelin/contracts/access/IAccessControl.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {PausableUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol";
+
 import {L1Escrow} from "@src/L1Escrow.sol";
 import {Proxy} from "@src/Proxy.sol";
 
@@ -23,8 +26,19 @@ contract L1EscrowTest is Test {
     address manager = vm.addr(0xD4DD1);
     address alice = vm.addr(0xA11CE);
 
+    address polygonZkEVMBridge = 0x2a3DD3EB832aF982ec71669E178424b10Dca2EDe;
+    IERC20 originToken = IERC20(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2); // WETH
+
     ICREATE3Factory create3Factory = ICREATE3Factory(0x93FEC2C00BfE902F733B57c5a6CeeD7CD1384AE1); // on mainnet
     L1Escrow escrow;
+
+    function _getL2EscrowAddress() internal returns (address) {
+        return create3Factory.getDeployed(deployer, keccak256(bytes("L2Escrow:WETH")));
+    }
+
+    function _getL2Tokenddress() internal returns (address) {
+        return create3Factory.getDeployed(deployer, keccak256(bytes("L2Token:WETH")));
+    }
 
     /// @dev Step by step to deploy L1Escrow
     function _deployL1Escrow() internal returns (L1Escrow deployed) {
@@ -33,8 +47,11 @@ contract L1EscrowTest is Test {
         L1Escrow implementation = new L1Escrow();
 
         // Step 2: Deploy upgradeable proxy contract
-        bytes memory data = abi.encodeWithSelector(L1Escrow.initialize.selector, admin, manager);
-        bytes32 salt = keccak256(bytes("L1Escrow:SOMETOKEN")); // NOTE: this should be L1Escrow:USDC on mainnet
+        address counterpartContract = _getL2EscrowAddress();
+        uint32 counterpartNetwork = 1;
+        address wrappedTokenAddress = _getL2Tokenddress();
+        bytes memory data = abi.encodeWithSelector(L1Escrow.initialize.selector, admin, manager, polygonZkEVMBridge, counterpartContract, counterpartNetwork, address(originToken), wrappedTokenAddress);
+        bytes32 salt = keccak256(bytes("L1Escrow:WETH"));
         bytes memory creationCode = abi.encodePacked(type(Proxy).creationCode, abi.encode(address(implementation), data));
         address deployedAddress = create3Factory.deploy(salt, creationCode);
 
@@ -51,7 +68,7 @@ contract L1EscrowTest is Test {
     }
 
     // ****************************
-    // *          Upgrade         *
+    // *         Upgrade          *
     // ****************************
 
     /// @dev It should hit a snag and revert if someone who's not an admin tries to upgrade the L1Escrow
@@ -106,5 +123,33 @@ contract L1EscrowTest is Test {
         assertTrue(escrow.paused());
         escrow.unpause();
         assertFalse(escrow.paused());
+    }
+
+    // ****************************
+    // *           Bridge         *
+    // ****************************
+
+    function testBridgeToken() public {
+        deal(address(originToken), alice, 10 ether);
+
+        vm.startPrank(alice);
+        originToken.approve(address(escrow), 10 ether);
+        escrow.bridgeToken(alice, 10 ether, true);
+        vm.stopPrank();
+
+        assertEq(originToken.balanceOf(alice), 0);
+    }
+
+    function testBridgeTokenWhenPaused() public {
+        vm.startPrank(admin);
+        escrow.pause();
+        vm.stopPrank();
+
+        deal(address(originToken), alice, 10 ether);
+
+        vm.startPrank(alice);
+        vm.expectRevert(PausableUpgradeable.EnforcedPause.selector);
+        escrow.bridgeToken(alice, 10 ether, true);
+        vm.stopPrank();
     }
 }
