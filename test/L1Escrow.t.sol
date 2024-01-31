@@ -50,9 +50,9 @@ contract L1EscrowTest is Test {
         escrow = _deployL1Escrow();
     }
 
-    //****************************//
-    //          Upgrade           //
-    //****************************//
+    // ****************************
+    // *          Upgrade         *
+    // ****************************
 
     /// @dev It should hit a snag and revert if someone who's not an admin tries to upgrade the L1Escrow
     function testUpgradeAsNonAdmin() public {
@@ -79,5 +79,32 @@ contract L1EscrowTest is Test {
         L1EscrowV2 escrowV2 = L1EscrowV2(address(escrow));
         escrowV2.setValue(1 ether);
         assertEq(escrowV2.getValue(), 1 ether);
+    }
+
+    // ****************************
+    // *          Pause           *
+    // ****************************
+
+    /// @dev Some random person shouldn't have the power to pause the contract
+    function testPauseAsNonAdmin() public {
+        vm.startPrank(alice);
+        vm.expectRevert(abi.encodeWithSelector(IAccessControl.AccessControlUnauthorizedAccount.selector, alice, 0x00));
+        escrow.pause();
+    }
+
+    /// @dev Some random person shouldn't have the power to unpause the contract
+    function testUnpauseAsNonAdmin() public {
+        vm.startPrank(alice);
+        vm.expectRevert(abi.encodeWithSelector(IAccessControl.AccessControlUnauthorizedAccount.selector, alice, 0x00));
+        escrow.unpause();
+    }
+
+    /// @dev Admin should able to pause and unpause the contract
+    function testPauseUnpauseAsAdmin() public {
+        vm.startPrank(admin);
+        escrow.pause();
+        assertTrue(escrow.paused());
+        escrow.unpause();
+        assertFalse(escrow.paused());
     }
 }
