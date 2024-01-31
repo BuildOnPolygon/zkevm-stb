@@ -45,6 +45,7 @@ Create `.env` file with the following content:
 
 ```shell
 ETH_RPC_URL="https://ethereum.publicnode.com"
+ZKEVM_RPC_URL="https://zkevm-rpc.com"
 ```
 
 Run the test:
