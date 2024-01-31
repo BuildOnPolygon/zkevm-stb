@@ -18,6 +18,19 @@ Source code for Staking The Bridge project by Polygon ZkEVM.
     - Ability to withdraw ETH/ERC-20 tokens from backing
 - Follow the ERC-20 Mintable Interface supported by Polygon Portal
 
+### L2Token
+
+- This contract is the ERC-20 on L2.
+- Roles:
+  - **Admin**
+    - Ability to upgrade the contract
+    - Ability to pause the contract
+  - **Escrow**
+    - Ability to mint and burn token via `bridgeMint` and `bridgeBurn`
+  - **Converter**
+    - Ability to mint and burn token via `convertMint` and `convertBurn`
+- Should follow the ERC-20 Mintable Interface
+
 ## Development
 
 Install latest version of [foundry](https://github.com/foundry-rs/foundry).
