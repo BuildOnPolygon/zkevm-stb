@@ -1,6 +1,6 @@
-# ERC20 Bridge on Polygon ZkEVM
+# Staking The Bridge by Polygon ZkEVM
 
-This is implementation of Universal ERC20 Bridge that will work for any ERC20.
+Source code for Staking The Bridge project by Polygon ZkEVM.
 
 ## Contracts
 
