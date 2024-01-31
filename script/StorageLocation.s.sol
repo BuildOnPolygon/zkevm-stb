@@ -6,7 +6,7 @@ import {Script, console2} from "forge-std/Script.sol";
 contract StorageLocationScript is Script {
     function setUp() public {}
 
-    function run() public pure {
+    function run() public view {
         bytes32 L1EscrowStorageLocation = keccak256(abi.encode(uint256(keccak256("pyk.storage.L1Escrow")) - 1)) & ~bytes32(uint256(0xff));
         console2.logString("L1EscrowStorageLocation");
         console2.logBytes32(L1EscrowStorageLocation);
@@ -14,5 +14,9 @@ contract StorageLocationScript is Script {
         bytes32 L1EscrowV2StorageLocation = keccak256(abi.encode(uint256(keccak256("pyk.storage.L1EscrowV2")) - 1)) & ~bytes32(uint256(0xff));
         console2.logString("L1EscrowV2StorageLocation");
         console2.logBytes32(L1EscrowV2StorageLocation);
+
+        bytes32 PolygonBridgeBaseStorageLocation = keccak256(abi.encode(uint256(keccak256("pyk.storage.PolygonBridgeBase")) - 1)) & ~bytes32(uint256(0xff));
+        console2.logString("PolygonBridgeBaseStorageLocation");
+        console2.logBytes32(PolygonBridgeBaseStorageLocation);
     }
 }
