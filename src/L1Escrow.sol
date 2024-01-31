@@ -58,6 +58,12 @@ contract L1Escrow is AccessControlDefaultAdminRulesUpgradeable, UUPSUpgradeable,
     }
 
     // ****************************
+    // *           Event          *
+    // ****************************
+
+    event Withdraw(address recipient, uint256 amount);
+
+    // ****************************
     // *        Initializer       *
     // ****************************
 
@@ -163,5 +169,6 @@ contract L1Escrow is AccessControlDefaultAdminRulesUpgradeable, UUPSUpgradeable,
     function withdraw(address _recipient, uint256 _amount) external virtual onlyRole(ESCROW_MANAGER_ROLE) whenNotPaused {
         L1EscrowStorage storage $ = _getL1EscrowStorage();
         $.originTokenAddress.safeTransfer(_recipient, _amount);
+        emit Withdraw(_recipient, _amount);
     }
 }

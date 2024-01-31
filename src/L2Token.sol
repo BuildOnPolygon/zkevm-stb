@@ -97,4 +97,26 @@ contract L2Token is AccessControlDefaultAdminRulesUpgradeable, UUPSUpgradeable, 
     function bridgeBurn(address from, uint256 amount) external onlyRole(ESCROW_ROLE) whenNotPaused {
         _burn(from, amount);
     }
+
+    // ****************************
+    // *         Converter        *
+    // ****************************
+
+    /**
+     * @notice Mint token as converter
+     * @param to the recipeint address
+     * @param amount the token amount
+     */
+    function converterMint(address to, uint256 amount) external onlyRole(CONVERTER_ROLE) whenNotPaused {
+        _mint(to, amount);
+    }
+
+    /**
+     * @notice Burn token as converter
+     * @param from the owner address
+     * @param amount the token amount
+     */
+    function converterBurn(address from, uint256 amount) external onlyRole(CONVERTER_ROLE) whenNotPaused {
+        _burn(from, amount);
+    }
 }

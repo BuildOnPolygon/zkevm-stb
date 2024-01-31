@@ -15,7 +15,7 @@ Source code for Staking The Bridge project by Polygon ZkEVM.
     - Ability to pause the contract
     - Ability to grant/revoke roles
   - **EscrowManager**
-    - Ability to withdraw ETH/ERC-20 tokens from backing
+    - Ability to withdraw ERC-20 tokens from backing
 - Follow the ERC-20 Mintable Interface supported by Polygon Portal
 
 ### L2Token
@@ -48,8 +48,7 @@ Source code for Staking The Bridge project by Polygon ZkEVM.
 
 ### L2TokenConverter
 
-- The L2TokenConverter takes ERC20 from users on L2 and swaps it for L2Token at a
-  pre-determined exchange rate.
+- User can deposit ERC-20 to L2TokenConverter in exchange for L2Token
 - L2TokenConverter is upgradable.
 - Roles:
   - **Admin**
@@ -57,10 +56,14 @@ Source code for Staking The Bridge project by Polygon ZkEVM.
     - Ability to pause the contract
     - Ability to grant/revoke roles
   - **EscrowManager**
-    - Ability to withdraw ETH/ERC-20 tokens from backing
+    - Ability to withdraw ERC-20 tokens from backing
   - **RiskManager**
     - Ability to change issue cap
-- Follow the ERC-20 Mintable Interface supported by Polygon Portal
+- Escrow manager can withdraw the ERC-20 inside L2TokenConverter via `withdraw` function
+- Risk manager can increase or reduce the issuance cap of the ERC-20 <-> L2Token
+  via `setIssuanceCap`
+- User can deposit ERC-20 in exchange for L2Token via `deposit`
+- User can withdraw ERC-20 by burning the L2Token via `withdraw`
 
 ## Development
 
