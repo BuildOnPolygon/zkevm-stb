@@ -7,8 +7,8 @@ Source code for Staking The Bridge project by Polygon ZkEVM.
 ### L1Escrow
 
 - L1Escrow receive TKN from users on L1 and trigger a mint of the TKN on L2 via LxLy.
-- L1Escrow is upgradable.
 - L1Escrow hold the backing for TKN and contain the investment logic.
+- L1Escrow is upgradable.
 - Roles:
   - **Admin**
     - Ability to upgrade the contract
