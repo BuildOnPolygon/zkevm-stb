@@ -39,3 +39,9 @@ Run the test:
 ```shell
 forge test
 ```
+
+Get the storage location address:
+
+```shell
+forge script StorageLocationScript
+```
