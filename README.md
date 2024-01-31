@@ -25,11 +25,26 @@ Source code for Staking The Bridge project by Polygon ZkEVM.
   - **Admin**
     - Ability to upgrade the contract
     - Ability to pause the contract
+    - Ability to grant/revoke roles
   - **Escrow**
     - Ability to mint and burn token via `bridgeMint` and `bridgeBurn`
   - **Converter**
     - Ability to mint and burn token via `convertMint` and `convertBurn`
-- Should follow the ERC-20 Mintable Interface
+- Admin can give the Converter role to a bunch of different contracts
+
+### L2Escrow
+
+- This contract is responsible for receive cross-chain message from
+  L1Escrow then mint L2Token
+- L2Escrow receive L2Token from users on L2 and trigger a release of the TKN
+  on L1 via LxLy.
+- L2Escrow is upgradable.
+- Roles:
+  - **Admin**
+    - Ability to upgrade the contract
+    - Ability to pause the contract
+    - Ability to grant/revoke roles
+- Follow the ERC-20 Mintable Interface supported by Polygon Portal
 
 ## Development
 

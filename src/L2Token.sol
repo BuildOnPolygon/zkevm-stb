@@ -75,4 +75,26 @@ contract L2Token is AccessControlDefaultAdminRulesUpgradeable, UUPSUpgradeable, 
     function unpause() external virtual onlyRole(DEFAULT_ADMIN_ROLE) {
         _unpause();
     }
+
+    // ****************************
+    // *           Bridge         *
+    // ****************************
+
+    /**
+     * @notice Mint token as bridge
+     * @param to the recipeint address
+     * @param amount the token amount
+     */
+    function bridgeMint(address to, uint256 amount) external onlyRole(ESCROW_ROLE) whenNotPaused {
+        _mint(to, amount);
+    }
+
+    /**
+     * @notice Burn token as bridge
+     * @param from the owner address
+     * @param amount the token amount
+     */
+    function bridgeBurn(address from, uint256 amount) external onlyRole(ESCROW_ROLE) whenNotPaused {
+        _burn(from, amount);
+    }
 }
