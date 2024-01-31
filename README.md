@@ -17,3 +17,25 @@ Source code for Staking The Bridge project by Polygon ZkEVM.
   - **EscrowManager**
     - Ability to withdraw ETH/ERC-20 tokens from backing
 - Follow the ERC-20 Mintable Interface supported by Polygon Portal
+
+## Development
+
+Install latest version of [foundry](https://github.com/foundry-rs/foundry).
+
+Install dependencies:
+
+```shell
+forge install
+```
+
+Create `.env` file with the following content:
+
+```shell
+ETH_RPC_URL="https://ethereum.publicnode.com"
+```
+
+Run the test:
+
+```shell
+forge test
+```
