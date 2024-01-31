@@ -1,0 +1,60 @@
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.23;
+
+import {Test} from "forge-std/Test.sol";
+
+import {IAccessControl} from "@openzeppelin/contracts/access/IAccessControl.sol";
+import {L1Escrow} from "@src/L1Escrow.sol";
+import {Proxy} from "@src/Proxy.sol";
+
+import {ICREATE3Factory} from "./interfaces/ICREATE3Factory.sol";
+
+/**
+ * @title L1EscrowTest
+ * @author sepyke.eth
+ * @notice Tests for L1Escrow
+ */
+contract L1EscrowTest is Test {
+    string ETH_RPC_URL = vm.envString("ETH_RPC_URL");
+
+    address deployer = vm.addr(0xC14C13);
+    address admin = vm.addr(0xB453D);
+    address manager = vm.addr(0xD4DD1);
+    address alice = vm.addr(0xA11CE);
+
+    ICREATE3Factory create3Factory = ICREATE3Factory(0x93FEC2C00BfE902F733B57c5a6CeeD7CD1384AE1); // on mainnet
+    L1Escrow escrow;
+
+    /// @dev Step by step to deploy L1Escrow
+    function _deployL1Escrow() internal returns (L1Escrow deployed) {
+        vm.startPrank(deployer);
+        // Step 1: Deploy implementation contract
+        L1Escrow implementation = new L1Escrow();
+
+        // Step 2: Deploy upgradeable proxy contract
+        bytes memory data = abi.encodeWithSelector(L1Escrow.initialize.selector, admin, manager);
+        bytes32 salt = keccak256(bytes("L1Escrow:SOMETOKEN")); // NOTE: this should be L1Escrow:USDC on mainnet
+        bytes memory creationCode = abi.encodePacked(type(Proxy).creationCode, abi.encode(address(implementation), data));
+        address deployedAddress = create3Factory.deploy(salt, creationCode);
+
+        // Step 3: Return the address
+        deployed = L1Escrow(deployedAddress);
+        vm.stopPrank();
+    }
+
+    function setUp() public {
+        uint256 ethFork = vm.createFork(ETH_RPC_URL);
+        vm.selectFork(ethFork);
+
+        escrow = _deployL1Escrow();
+    }
+
+    //****************************//
+    //          Upgrade           //
+    //****************************//
+    function testUpgradeAsNonAdmin() public {
+        vm.startPrank(alice);
+        vm.expectRevert(abi.encodeWithSelector(IAccessControl.AccessControlUnauthorizedAccount.selector, alice, 0x00));
+        escrow.upgradeToAndCall(vm.addr(2), "");
+    }
+}
