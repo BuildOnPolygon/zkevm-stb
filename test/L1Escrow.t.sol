@@ -66,12 +66,18 @@ contract L1EscrowTest is Test {
         // Step 1: Deploy implementation contract
         L1EscrowV2 v2 = new L1EscrowV2();
 
-        // Step 2: Prepare the initializer call data
-        bytes memory data = abi.encodeWithSelector(L1EscrowV2.initialize.selector, admin, manager);
-
-        // Step 3: Admin execute upgrade
+        // Step 2: Admin execute upgrade
         vm.startPrank(admin);
-        escrow.upgradeToAndCall(address(v2), data);
+        escrow.upgradeToAndCall(address(v2), "");
         vm.stopPrank();
+
+        // Make sure V1 storage is still valid
+        assertTrue(escrow.hasRole(0x00, admin));
+        assertTrue(escrow.hasRole(escrow.ESCROW_MANAGER(), manager));
+
+        // Make sure new function(s) exists
+        L1EscrowV2 escrowV2 = L1EscrowV2(address(escrow));
+        escrowV2.setValue(1 ether);
+        assertEq(escrowV2.getValue(), 1 ether);
     }
 }

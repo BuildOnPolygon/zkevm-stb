@@ -1,33 +1,34 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.23;
 
-import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import {AccessControlDefaultAdminRulesUpgradeable} from "@openzeppelin/contracts-upgradeable/access/extensions/AccessControlDefaultAdminRulesUpgradeable.sol"; // forgefmt: disable-line
+import {L1Escrow} from "@src/L1Escrow.sol";
 
 /**
  * @title L1EscrowV2
  * @author sepyke.eth
  */
-contract L1EscrowV2 is AccessControlDefaultAdminRulesUpgradeable, UUPSUpgradeable {
-    /// @notice Escrow manager role identifier
-    bytes32 public constant ESCROW_MANAGER = keccak256("ESCROW_MANAGER");
-
-    /// @notice Disable initializer on deploy
-    constructor() {
-        _disableInitializers();
+contract L1EscrowV2 is L1Escrow {
+    /// @custom:storage-location erc7201:pyk.storage.L1EscrowV2
+    struct L1EscrowV2Storage {
+        uint256 value;
     }
 
-    function initialize(address _admin, address _manager) public virtual initializer {
-        // Inits
-        __AccessControlDefaultAdminRules_init(3 days, _admin);
-        __UUPSUpgradeable_init();
+    // keccak256(abi.encode(uint256(keccak256("pyk.storage.L1EscrowV2")) - 1)) & ~bytes32(uint256(0xff))
+    bytes32 private constant L1EscrowV2StorageLocation = 0x32abdc91491ad48cf6fa4682a04c64a48bd02909347b70fc4e3c442d56dff700;
 
-        _grantRole(ESCROW_MANAGER, _manager);
+    function _getL1EscrowV2Storage() private pure returns (L1EscrowV2Storage storage $) {
+        assembly {
+            $.slot := L1EscrowV2StorageLocation
+        }
     }
 
-    /**
-     * @dev Only the owner can upgrade the L1Escrow
-     * @param _newVersion The contract address of a new version
-     */
-    function _authorizeUpgrade(address _newVersion) internal override onlyRole(DEFAULT_ADMIN_ROLE) {}
+    function setValue(uint256 _value) public {
+        L1EscrowV2Storage storage $ = _getL1EscrowV2Storage();
+        $.value = _value;
+    }
+
+    function getValue() public view returns (uint256 _value) {
+        L1EscrowV2Storage storage $ = _getL1EscrowV2Storage();
+        _value = $.value;
+    }
 }
