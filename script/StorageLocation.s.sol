@@ -34,5 +34,13 @@ contract StorageLocationScript is Script {
         bytes32 L2EscrowV2StorageLocation = keccak256(abi.encode(uint256(keccak256("pyk.storage.L2EscrowV2")) - 1)) & ~bytes32(uint256(0xff));
         console2.logString("L2EscrowV2StorageLocation");
         console2.logBytes32(L2EscrowV2StorageLocation);
+
+        bytes32 L2TokenConverterStorageLocation = keccak256(abi.encode(uint256(keccak256("pyk.storage.L2TokenConverter")) - 1)) & ~bytes32(uint256(0xff));
+        console2.logString("L2TokenConverterStorageLocation");
+        console2.logBytes32(L2TokenConverterStorageLocation);
+
+        bytes32 L2TokenConverterV2StorageLocation = keccak256(abi.encode(uint256(keccak256("pyk.storage.L2TokenConverterV2")) - 1)) & ~bytes32(uint256(0xff));
+        console2.logString("L2TokenConverterV2StorageLocation");
+        console2.logBytes32(L2TokenConverterV2StorageLocation);
     }
 }
