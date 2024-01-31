@@ -85,7 +85,7 @@ Run the test:
 forge test
 ```
 
-Get the storage location address:
+Get the storage location addresses:
 
 ```shell
 forge script StorageLocationScript
