@@ -26,7 +26,7 @@ contract L1Escrow is AccessControlDefaultAdminRulesUpgradeable, UUPSUpgradeable,
     // ****************************
 
     /// @notice Escrow manager role identifier
-    bytes32 public constant ESCROW_MANAGER = keccak256("ESCROW_MANAGER");
+    bytes32 public constant ESCROW_MANAGER_ROLE = keccak256("ESCROW_MANAGER_ROLE");
 
     // ****************************
     // *      ERC-7201 Storage    *
@@ -90,7 +90,7 @@ contract L1Escrow is AccessControlDefaultAdminRulesUpgradeable, UUPSUpgradeable,
         __UUPSUpgradeable_init();
         __Pausable_init();
         __PolygonERC20BridgeBase_init(_polygonZkEVMBridge, _counterpartContract, _counterpartNetwork);
-        _grantRole(ESCROW_MANAGER, _manager);
+        _grantRole(ESCROW_MANAGER_ROLE, _manager);
 
         // Set storage
         L1EscrowStorage storage $ = _getL1EscrowStorage();
@@ -149,5 +149,19 @@ contract L1Escrow is AccessControlDefaultAdminRulesUpgradeable, UUPSUpgradeable,
     function _transferTokens(address destinationAddress, uint256 amount) internal virtual override whenNotPaused {
         L1EscrowStorage storage $ = _getL1EscrowStorage();
         $.originTokenAddress.safeTransfer(destinationAddress, amount);
+    }
+
+    // ****************************
+    // *          Manager         *
+    // ****************************
+
+    /**
+     * @dev Escrow manager can withdraw the token backing
+     * @param _recipient the recipient address
+     * @param _amount The amount of token
+     */
+    function withdraw(address _recipient, uint256 _amount) external virtual onlyRole(ESCROW_MANAGER_ROLE) whenNotPaused {
+        L1EscrowStorage storage $ = _getL1EscrowStorage();
+        $.originTokenAddress.safeTransfer(_recipient, _amount);
     }
 }

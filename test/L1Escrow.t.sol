@@ -90,7 +90,7 @@ contract L1EscrowTest is Test {
 
         // Make sure V1 storage is still valid
         assertTrue(escrow.hasRole(0x00, admin));
-        assertTrue(escrow.hasRole(escrow.ESCROW_MANAGER(), manager));
+        assertTrue(escrow.hasRole(escrow.ESCROW_MANAGER_ROLE(), manager));
 
         // Make sure new function(s) exists
         L1EscrowV2 escrowV2 = L1EscrowV2(address(escrow));
@@ -151,5 +151,26 @@ contract L1EscrowTest is Test {
         vm.expectRevert(PausableUpgradeable.EnforcedPause.selector);
         escrow.bridgeToken(alice, 10 ether, true);
         vm.stopPrank();
+    }
+
+    // ****************************
+    // *          Manager         *
+    // ****************************
+
+    function testWithdrawAsNonManager() public {
+        vm.startPrank(alice);
+        vm.expectRevert(abi.encodeWithSelector(IAccessControl.AccessControlUnauthorizedAccount.selector, alice, escrow.ESCROW_MANAGER_ROLE()));
+        escrow.withdraw(alice, 10 ether);
+    }
+
+    function testWithdrawAsManager() public {
+        deal(address(originToken), address(escrow), 10 ether);
+
+        vm.startPrank(manager);
+        escrow.withdraw(manager, 10 ether);
+        vm.stopPrank();
+
+        assertEq(originToken.balanceOf(manager), 10 ether);
+        assertEq(originToken.balanceOf(address(escrow)), 0);
     }
 }
