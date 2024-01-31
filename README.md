@@ -21,6 +21,7 @@ Source code for Staking The Bridge project by Polygon ZkEVM.
 ### L2Token
 
 - This contract is the ERC-20 on L2.
+- L2Token is upgradable.
 - Roles:
   - **Admin**
     - Ability to upgrade the contract
@@ -43,7 +44,22 @@ Source code for Staking The Bridge project by Polygon ZkEVM.
   - **Admin**
     - Ability to upgrade the contract
     - Ability to pause the contract
+- Follow the ERC-20 Mintable Interface supported by Polygon Portal
+
+### L2TokenConverter
+
+- The L2TokenConverter takes ERC20 from users on L2 and swaps it for L2Token at a
+  pre-determined exchange rate.
+- L2TokenConverter is upgradable.
+- Roles:
+  - **Admin**
+    - Ability to upgrade the contract
+    - Ability to pause the contract
     - Ability to grant/revoke roles
+  - **EscrowManager**
+    - Ability to withdraw ETH/ERC-20 tokens from backing
+  - **RiskManager**
+    - Ability to change issue cap
 - Follow the ERC-20 Mintable Interface supported by Polygon Portal
 
 ## Development
