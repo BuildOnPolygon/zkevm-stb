@@ -15,10 +15,22 @@ import {PolygonERC20BridgeBaseUpgradeable} from "./PolygonERC20BridgeBaseUpgrade
  * @dev This contract is what keeps the L2Token backed up on the origin chain
  */
 contract L1Escrow is AccessControlDefaultAdminRulesUpgradeable, UUPSUpgradeable, PausableUpgradeable, PolygonERC20BridgeBaseUpgradeable {
+    // ****************************
+    // *         Libraries        *
+    // ****************************
+
     using SafeERC20 for IERC20;
+
+    // ****************************
+    // *           Roles          *
+    // ****************************
 
     /// @notice Escrow manager role identifier
     bytes32 public constant ESCROW_MANAGER = keccak256("ESCROW_MANAGER");
+
+    // ****************************
+    // *      ERC-7201 Storage    *
+    // ****************************
 
     /// @custom:storage-location erc7201:pyk.storage.L1Escrow
     struct L1EscrowStorage {
@@ -44,6 +56,10 @@ contract L1Escrow is AccessControlDefaultAdminRulesUpgradeable, UUPSUpgradeable,
         L1EscrowStorage storage $ = _getL1EscrowStorage();
         return $.wrappedTokenAddress;
     }
+
+    // ****************************
+    // *        Initializer       *
+    // ****************************
 
     /// @notice Disable initializer on deploy
     constructor() {
