@@ -157,8 +157,6 @@ contract L2TokenConverter is AccessControlDefaultAdminRulesUpgradeable, UUPSUpgr
     /// @dev User can withdraw ERC-20 by burning L2Token
     function withdraw(IERC20Metadata _token, IL2Token _l2Token, address _recipient, uint256 _amount) external virtual {
         L2TokenConverterStorage storage $ = _getL2TokenConverterStorage();
-        uint256 maxIssuance = $.issuances[_token][_l2Token];
-        if (_amount > maxIssuance) revert MaxIssuance();
 
         // Freed up some issuance quota
         $.issuances[_token][_l2Token] += _amount;
