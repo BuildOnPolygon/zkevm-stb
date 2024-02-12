@@ -20,7 +20,6 @@ contract L2TokenConverter is AccessControlDefaultAdminRulesUpgradeable, UUPSUpgr
     // ****************************
 
     using SafeERC20 for IERC20Metadata;
-    using SafeERC20 for IL2Token;
 
     // ****************************
     // *           Roles          *

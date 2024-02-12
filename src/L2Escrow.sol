@@ -16,12 +16,6 @@ import {IL2Token} from "./interfaces/IL2Token.sol";
  */
 contract L2Escrow is AccessControlDefaultAdminRulesUpgradeable, UUPSUpgradeable, PausableUpgradeable, PolygonERC20BridgeBaseUpgradeable {
     // ****************************
-    // *         Libraries        *
-    // ****************************
-
-    using SafeERC20 for IL2Token;
-
-    // ****************************
     // *      ERC-7201 Storage    *
     // ****************************
 
