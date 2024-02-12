@@ -42,6 +42,7 @@ abstract contract PolygonERC20BridgeBaseUpgradeable is PolygonBridgeBaseUpgradea
      * @param forceUpdateGlobalExitRoot Indicates if the global exit root is updated or not
      */
     function bridgeToken(address destinationAddress, uint256 amount, bool forceUpdateGlobalExitRoot) external {
+        require(destinationAddress != address(0), "TokenWrapped::PolygonBridgeERC20Base: Zero Address");
         _receiveTokens(amount);
 
         // Encode message data
