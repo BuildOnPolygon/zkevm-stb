@@ -93,3 +93,8 @@ Get the storage location addresses:
 ```shell
 forge script StorageLocationScript
 ```
+
+## Deployment
+
+This contract is depends on [CREATE3Factory](https://github.com/ZeframLou/create3-factory)
+make sure it get deployed on source and target chain with the same address.
