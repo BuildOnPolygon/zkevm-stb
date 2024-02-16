@@ -31,10 +31,6 @@ contract L2TokenTest is Test {
         return create3Factory.getDeployed(deployer, keccak256(bytes("L2Escrow:WETH")));
     }
 
-    function _getL2Tokenddress() internal returns (address) {
-        return create3Factory.getDeployed(deployer, keccak256(bytes("L2Token:WETH")));
-    }
-
     /// @dev Step by step to deploy L2Token
     function _deployL2Token() internal returns (L2Token deployed) {
         vm.startPrank(deployer);

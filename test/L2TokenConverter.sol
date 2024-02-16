@@ -30,6 +30,10 @@ contract L2TokenConverterTest is Test {
     ICREATE3Factory create3Factory = ICREATE3Factory(0x93FEC2C00BfE902F733B57c5a6CeeD7CD1384AE1); // on mainnet
     L2TokenConverter converter;
 
+    function _getL2TokenAddress() internal returns (address) {
+        return create3Factory.getDeployed(deployer, keccak256(bytes("L2Token:WETH")));
+    }
+
     /// @dev Step by step to deploy L2TokenConverter
     function _deployL2TokenConverter() internal returns (L2TokenConverter deployed) {
         vm.startPrank(deployer);
@@ -37,7 +41,8 @@ contract L2TokenConverterTest is Test {
         L2TokenConverter implementation = new L2TokenConverter();
 
         // Step 2: Deploy upgradeable proxy contract
-        bytes memory data = abi.encodeWithSelector(L2TokenConverter.initialize.selector, admin, escrower, risker);
+        address l2Token = _getL2TokenAddress();
+        bytes memory data = abi.encodeWithSelector(L2TokenConverter.initialize.selector, admin, escrower, risker, l2Token);
         bytes32 salt = keccak256(bytes("L2TokenConverter"));
         bytes memory creationCode = abi.encodePacked(type(Proxy).creationCode, abi.encode(address(implementation), data));
         address deployedAddress = create3Factory.deploy(salt, creationCode);
@@ -119,8 +124,8 @@ contract L2TokenConverterTest is Test {
 
     // function testWithdrawAsNonManager() public {
     //     vm.startPrank(alice);
-    //     vm.expectRevert(abi.encodeWithSelector(IAccessControl.AccessControlUnauthorizedAccount.selector, alice, escrow.ESCROW_MANAGER_ROLE()));
-    //     escrow.withdraw(alice, 10 ether);
+    //     vm.expectRevert(abi.encodeWithSelector(IAccessControl.AccessControlUnauthorizedAccount.selector, alice, converter.ESCROW_MANAGER_ROLE()));
+    //     converter.managerWithdraw(, _recipient, _amount);
     // }
 
     // function testWithdrawAsManager() public {

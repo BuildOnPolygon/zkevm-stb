@@ -34,7 +34,8 @@ contract L2TokenConverter is AccessControlDefaultAdminRulesUpgradeable, UUPSUpgr
 
     /// @custom:storage-location erc7201:polygon.storage.L2TokenConverter
     struct L2TokenConverterStorage {
-        mapping(IERC20Metadata source => mapping(IL2Token target => uint256 max)) issuances;
+        IL2Token target;
+        mapping(IERC20Metadata source => uint256 max) issuances;
     }
 
     // keccak256(abi.encode(uint256(keccak256("polygon.storage.L2TokenConverter")) - 1)) & ~bytes32(uint256(0xff))
@@ -46,18 +47,18 @@ contract L2TokenConverter is AccessControlDefaultAdminRulesUpgradeable, UUPSUpgr
         }
     }
 
-    function getMaxIssuance(IERC20Metadata _token, IL2Token _l2Token) public view virtual returns (uint256) {
+    function getMaxIssuance(IERC20Metadata _token) public view virtual returns (uint256) {
         L2TokenConverterStorage storage $ = _getL2TokenConverterStorage();
-        return $.issuances[_token][_l2Token];
+        return $.issuances[_token];
     }
 
     // ****************************
     // *           Event          *
     // ****************************
 
-    event IssuanceUpdated(IERC20Metadata indexed token, IL2Token indexed l2token, uint256 amount);
-    event Deposit(IERC20Metadata indexed token, IL2Token indexed l2token, address sender, address recipient, uint256 amount);
-    event Withdraw(IERC20Metadata indexed token, IL2Token indexed l2token, address sender, address recipient, uint256 amount);
+    event IssuanceUpdated(IERC20Metadata indexed token, uint256 amount);
+    event Deposit(IERC20Metadata indexed token, address sender, address recipient, uint256 amount);
+    event Withdraw(IERC20Metadata indexed token, address sender, address recipient, uint256 amount);
     event ManagerWithdraw(IERC20Metadata indexed token, address recipient, uint256 amount);
 
     // ****************************
@@ -81,8 +82,9 @@ contract L2TokenConverter is AccessControlDefaultAdminRulesUpgradeable, UUPSUpgr
      * @param _admin The admin address
      * @param _escrow The escrow manager address
      * @param _risk The risk manager address
+     * @param _l2Token The L2Token address
      */
-    function initialize(address _admin, address _escrow, address _risk) public virtual initializer {
+    function initialize(address _admin, address _escrow, address _risk, address _l2Token) public virtual initializer {
         // Inits
         __AccessControlDefaultAdminRules_init(3 days, _admin);
         __UUPSUpgradeable_init();
@@ -90,6 +92,9 @@ contract L2TokenConverter is AccessControlDefaultAdminRulesUpgradeable, UUPSUpgr
 
         _grantRole(ESCROW_MANAGER_ROLE, _escrow);
         _grantRole(RISK_MANAGER_ROLE, _risk);
+
+        L2TokenConverterStorage storage $ = _getL2TokenConverterStorage();
+        $.target = IL2Token(_l2Token);
     }
 
     // ****************************
@@ -129,41 +134,40 @@ contract L2TokenConverter is AccessControlDefaultAdminRulesUpgradeable, UUPSUpgr
     /// @dev Set issuance cap for source token (ERC-20) <-> target token (L2Token)
     /// @dev Risk manager can execute this function multiple time in order to reduce or increase the issuance cap
     /// @param _token ERC-20 address
-    /// @param _l2Token L2Token address
     /// @param _max maximum amount
-    function setIssuanceCap(IERC20Metadata _token, IL2Token _l2Token, uint256 _max) external virtual onlyRole(RISK_MANAGER_ROLE) whenNotPaused {
-        if (_token.decimals() != IERC20Metadata(address(_l2Token)).decimals()) revert TokenDecimalsInvalid();
+    function setIssuanceCap(IERC20Metadata _token, uint256 _max) external virtual onlyRole(RISK_MANAGER_ROLE) whenNotPaused {
         L2TokenConverterStorage storage $ = _getL2TokenConverterStorage();
-        $.issuances[_token][_l2Token] = _max;
-        emit IssuanceUpdated(_token, _l2Token, _max);
+        if (_token.decimals() != IERC20Metadata(address($.target)).decimals()) revert TokenDecimalsInvalid();
+        $.issuances[_token] = _max;
+        emit IssuanceUpdated(_token, _max);
     }
 
     /// @dev User can deposit ERC-20 in exchange for L2Token
-    function deposit(IERC20Metadata _token, IL2Token _l2Token, address _recipient, uint256 _amount) external virtual {
+    function deposit(IERC20Metadata _token, address _recipient, uint256 _amount) external virtual whenNotPaused {
         L2TokenConverterStorage storage $ = _getL2TokenConverterStorage();
-        uint256 maxIssuance = $.issuances[_token][_l2Token];
+        uint256 maxIssuance = $.issuances[_token];
         if (_amount > maxIssuance) revert MaxIssuance();
 
         // Reduce max issuance
-        $.issuances[_token][_l2Token] -= _amount;
+        $.issuances[_token] -= _amount;
 
         _token.safeTransferFrom(msg.sender, address(this), _amount);
-        _l2Token.converterMint(_recipient, _amount);
+        $.target.converterMint(_recipient, _amount);
 
-        emit Deposit(_token, _l2Token, msg.sender, _recipient, _amount);
+        emit Deposit(_token, msg.sender, _recipient, _amount);
     }
 
     /// @dev User can withdraw ERC-20 by burning L2Token
-    function withdraw(IERC20Metadata _token, IL2Token _l2Token, address _recipient, uint256 _amount) external virtual {
+    function withdraw(IERC20Metadata _token, address _recipient, uint256 _amount) external virtual whenNotPaused {
         L2TokenConverterStorage storage $ = _getL2TokenConverterStorage();
 
         // Freed up some issuance quota
-        $.issuances[_token][_l2Token] += _amount;
+        $.issuances[_token] += _amount;
 
-        _l2Token.converterBurn(msg.sender, _amount);
+        $.target.converterBurn(msg.sender, _amount);
         _token.safeTransfer(_recipient, _amount);
 
-        emit Withdraw(_token, _l2Token, msg.sender, _recipient, _amount);
+        emit Withdraw(_token, msg.sender, _recipient, _amount);
     }
 
     // ****************************
