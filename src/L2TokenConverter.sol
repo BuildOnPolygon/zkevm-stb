@@ -32,13 +32,13 @@ contract L2TokenConverter is AccessControlDefaultAdminRulesUpgradeable, UUPSUpgr
     // *      ERC-7201 Storage    *
     // ****************************
 
-    /// @custom:storage-location erc7201:pyk.storage.L2TokenConverter
+    /// @custom:storage-location erc7201:polygon.storage.L2TokenConverter
     struct L2TokenConverterStorage {
         mapping(IERC20Metadata source => mapping(IL2Token target => uint256 max)) issuances;
     }
 
-    // keccak256(abi.encode(uint256(keccak256("pyk.storage.L2TokenConverter")) - 1)) & ~bytes32(uint256(0xff))
-    bytes32 private constant L2TokenConverterStorageLocation = 0x0b3c8f661f5aed732bd10af3c82ca6cbf45e1ca2e6b04cc93e80372aaa927e00;
+    // keccak256(abi.encode(uint256(keccak256("polygon.storage.L2TokenConverter")) - 1)) & ~bytes32(uint256(0xff))
+    bytes32 private constant L2TokenConverterStorageLocation = 0x3bb72e938ae6c075bccfb66342f4d160e450009bc92ac6588be7b0c22fb29900;
 
     function _getL2TokenConverterStorage() private pure returns (L2TokenConverterStorage storage $) {
         assembly {
