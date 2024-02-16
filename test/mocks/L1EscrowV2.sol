@@ -8,13 +8,13 @@ import {L1Escrow} from "@src/L1Escrow.sol";
  * @author sepyke.eth
  */
 contract L1EscrowV2 is L1Escrow {
-    /// @custom:storage-location erc7201:pyk.storage.L1EscrowV2
+    /// @custom:storage-location erc7201:polygon.storage.L1EscrowV2
     struct L1EscrowV2Storage {
         uint256 value;
     }
 
-    // keccak256(abi.encode(uint256(keccak256("pyk.storage.L1EscrowV2")) - 1)) & ~bytes32(uint256(0xff))
-    bytes32 private constant L1EscrowV2StorageLocation = 0x32abdc91491ad48cf6fa4682a04c64a48bd02909347b70fc4e3c442d56dff700;
+    // keccak256(abi.encode(uint256(keccak256("polygon.storage.L1EscrowV2")) - 1)) & ~bytes32(uint256(0xff))
+    bytes32 private constant L1EscrowV2StorageLocation = 0xd8bfafcb52c0c43d2ab6d43d329f044eed49982336cc2ee45e95fc8864e0f900;
 
     function _getL1EscrowV2Storage() private pure returns (L1EscrowV2Storage storage $) {
         assembly {

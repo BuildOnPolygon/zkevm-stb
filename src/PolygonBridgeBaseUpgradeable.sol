@@ -13,15 +13,15 @@ import "./interfaces/IPolygonZkEVMBridge.sol";
  * https://github.com/0xPolygonHermez/code-examples/blob/41d266590db4fcdabb56cd29f407c728f40210ec/customERC20-bridge-example/contracts/base/PolygonBridgeBase.sol
  */
 abstract contract PolygonBridgeBaseUpgradeable is Initializable {
-    /// @custom:storage-location erc7201:pyk.storage.PolygonBridgeBase
+    /// @custom:storage-location erc7201:polygon.storage.PolygonBridgeBase
     struct PolygonBridgeBaseStorage {
         IPolygonZkEVMBridge polygonZkEVMBridge;
         address counterpartContract;
         uint32 counterpartNetwork;
     }
 
-    // keccak256(abi.encode(uint256(keccak256("pyk.storage.PolygonBridgeBase")) - 1)) & ~bytes32(uint256(0xff))
-    bytes32 private constant PolygonBridgeBaseStorageLocation = 0x1fbcab271ead81b0e7391dcb54354974e73635dcdb06f0ab189a4943efc46700;
+    // keccak256(abi.encode(uint256(keccak256("polygon.storage.PolygonBridgeBase")) - 1)) & ~bytes32(uint256(0xff))
+    bytes32 private constant PolygonBridgeBaseStorageLocation = 0xa2df0fe6db3ae7b9af51d186eeafd135102ceb6374bcad9534034e06f66daa00;
 
     function _getPolygonBridgeBaseStorage() private pure returns (PolygonBridgeBaseStorage storage $) {
         assembly {

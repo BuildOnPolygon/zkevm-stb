@@ -19,14 +19,14 @@ contract L2Escrow is AccessControlDefaultAdminRulesUpgradeable, UUPSUpgradeable,
     // *      ERC-7201 Storage    *
     // ****************************
 
-    /// @custom:storage-location erc7201:pyk.storage.L2Escrow
+    /// @custom:storage-location erc7201:polygon.storage.L2Escrow
     struct L2EscrowStorage {
         address originTokenAddress;
         IL2Token wrappedTokenAddress;
     }
 
-    // keccak256(abi.encode(uint256(keccak256("pyk.storage.L2Escrow")) - 1)) & ~bytes32(uint256(0xff))
-    bytes32 private constant L2EscrowStorageLocation = 0x98f6cc56fabf1cb1d76d47504ceb7bc7d466bde6264a04c764ffd27ee43e6400;
+    // keccak256(abi.encode(uint256(keccak256("polygon.storage.L2Escrow")) - 1)) & ~bytes32(uint256(0xff))
+    bytes32 private constant L2EscrowStorageLocation = 0xe8e2340b90fc26fa948a17a0ba78b4daffcbc869b4f5a93b9b6cdc8ddc39b700;
 
     function _getL2EscrowStorage() private pure returns (L2EscrowStorage storage $) {
         assembly {
