@@ -36,7 +36,7 @@ contract L1EscrowTest is Test {
         return create3Factory.getDeployed(deployer, keccak256(bytes("L2Escrow:WETH")));
     }
 
-    function _getL2Tokenddress() internal returns (address) {
+    function _getL2TokenAddress() internal returns (address) {
         return create3Factory.getDeployed(deployer, keccak256(bytes("L2Token:WETH")));
     }
 
@@ -49,7 +49,7 @@ contract L1EscrowTest is Test {
         // Step 2: Deploy upgradeable proxy contract
         address counterpartContract = _getL2EscrowAddress();
         uint32 counterpartNetwork = 1;
-        address wrappedTokenAddress = _getL2Tokenddress();
+        address wrappedTokenAddress = _getL2TokenAddress();
         bytes memory data = abi.encodeWithSelector(L1Escrow.initialize.selector, admin, manager, polygonZkEVMBridge, counterpartContract, counterpartNetwork, address(originToken), wrappedTokenAddress);
         bytes32 salt = keccak256(bytes("L1Escrow:WETH"));
         bytes memory creationCode = abi.encodePacked(type(Proxy).creationCode, abi.encode(address(implementation), data));
